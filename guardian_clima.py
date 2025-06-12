@@ -122,7 +122,6 @@ def iniciar_sesion():
             if fila['username'] == username and fila['password_simulada'] == password:
                 print(f"Inicio de sesión exitoso. Bienvenido, {username}!")
                 menu_principal(username)  # ← ACCEDE DIRECTO AL MENÚ
-                return
     print("Credenciales incorrectas. Intentá de nuevo.")
 
 def menu_acceso():
