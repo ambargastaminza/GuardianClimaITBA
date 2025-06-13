@@ -1,9 +1,12 @@
-# GuardianClimaITBA // 
+# GuardianClimaITBA //
 import csv
 import os
 import re
+import requests
+from datetime import datetime
 
 ARCHIVO_USUARIOS = 'usuarios_simulados.csv'
+ARCHIVO_HISTORIAL = 'historial_global.csv'
 
 # ------------------ VALIDACIÓN DE CONTRASEÑAS ------------------
 
@@ -49,6 +52,96 @@ def guardar_usuario(username, password):
         escritor = csv.writer(archivo)
         escritor.writerow([username, password])
 
+# ------------------ FUNCIONES CLIMA ------------------
+
+def obtener_clima(ciudad, api_key):
+    url = "https://api.openweathermap.org/data/2.5/weather"
+    params = {
+        'q': ciudad,
+        'appid': api_key,
+        'units': 'metric',
+        'lang': 'es'
+    }
+
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error al consultar la API: {e}")
+        return None
+
+def guardar_en_historial(username, ciudad, datos):
+    fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    temperatura = datos['main']['temp']
+    condicion = datos['weather'][0]['description']
+    humedad = datos['main']['humidity']
+    viento = datos['wind']['speed']
+
+    existe = os.path.exists(ARCHIVO_HISTORIAL)
+    with open(ARCHIVO_HISTORIAL, mode='a', newline='') as archivo:
+        escritor = csv.writer(archivo)
+        if not existe:
+            escritor.writerow(['username', 'ciudad', 'fecha_hora', 'temperatura', 'condicion_clima', 'humedad', 'viento'])
+        escritor.writerow([username, ciudad, fecha_hora, temperatura, condicion, humedad, viento])
+
+def consultar_clima_y_guardar(username, api_key):
+    ciudad = input("Ingresá el nombre de la ciudad: ").strip()
+
+    url = "https://api.openweathermap.org/data/2.5/weather"
+    params = {
+        'q': ciudad,
+        'appid': api_key,
+        'units': 'metric',
+        'lang': 'es'
+    }
+
+    try:
+        print(f"\n🔍 Buscando clima para {ciudad}...")
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        datos = response.json()
+
+        # Extraer datos relevantes
+        temperatura = datos['main']['temp']
+        sensacion = datos['main']['feels_like']
+        humedad = datos['main']['humidity']
+        descripcion = datos['weather'][0]['description']
+        viento = datos['wind']['speed']
+        fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Mostrar en consola
+        print("\n=== Clima Actual ===")
+        print(f"Ciudad: {ciudad}")
+        print(f"Temperatura: {temperatura}°C")
+        print(f"Sensación térmica: {sensacion}°C")
+        print(f"Humedad: {humedad}%")
+        print(f"Condición: {descripcion.capitalize()}")
+        print(f"Viento: {viento} km/h")
+
+        # Guardar en historial
+        nuevo = not os.path.exists(ARCHIVO_HISTORIAL)
+        with open(ARCHIVO_HISTORIAL, mode='a', newline='') as archivo:
+            escritor = csv.writer(archivo)
+            if nuevo:
+                escritor.writerow(['username', 'ciudad', 'fecha_hora', 'temperatura', 'condicion_clima', 'humedad', 'viento'])
+            escritor.writerow([username, ciudad, fecha_hora, temperatura, descripcion, humedad, viento])
+
+        print("✅ Consulta guardada en el historial.\n")
+
+    except requests.exceptions.HTTPError as errh:
+        if response.status_code == 404:
+            print("❌ Ciudad no encontrada. Verificá el nombre.")
+        elif response.status_code == 401:
+            print("❌ Error de autenticación: revisá tu API Key.")
+        else:
+            print(f"❌ Error de respuesta HTTP: {errh}")
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Error de conexión: {e}")
+    except KeyError:
+        print("❌ Error inesperado al procesar los datos de la API.")
+
+
 # ------------------ MENÚ PRINCIPAL ------------------
 
 def menu_principal(username):
@@ -65,7 +158,7 @@ def menu_principal(username):
         opcion = input("Seleccioná una opción: ")
 
         if opcion == '1':
-            print("[Opción 1] Consultar clima (a implementar)")
+            consultar_clima_y_guardar(username, "TU_API_KEY_ACÁ")
         elif opcion == '2':
             print("[Opción 2] Ver historial personal (a implementar)")
         elif opcion == '3':
@@ -82,9 +175,14 @@ def menu_principal(username):
 
 def mostrar_info_aplicacion():
     print("\n--- Acerca de GuardiánClima ITBA ---")
-    print("Esta aplicación permite consultar el clima, guardar un historial,")
-    print("ver estadísticas globales y recibir consejos de vestimenta con IA.")
-    print("Creada por el equipo [NOMBRE_DEL_GRUPO].")
+    print("GuardiánClima ITBA es una herramienta pensada para ayudarte a enfrentar el día con información precisa y relevante.")
+    print("Permite consultar el clima en tiempo real, guardar tu historial de búsquedas, analizar patrones y obtener consejos útiles de vestimenta usando inteligencia artificial.")
+    print()
+    print("Diseñada con foco en la experiencia del usuario, combina programación, análisis de datos y tecnologías actuales")
+    print("para ofrecer una solución simple, funcional y con proyección real.")
+    print()
+    print("Desarrollado por el equipo [NOMBRE_DEL_GRUPO] como parte del Challenge Tecnológico Integrador.")
+
 
 # ------------------ FLUJO DE ACCESO ------------------
 
@@ -122,7 +220,9 @@ def iniciar_sesion():
             if fila['username'] == username and fila['password_simulada'] == password:
                 print(f"Inicio de sesión exitoso. Bienvenido, {username}!")
                 menu_principal(username)  # ← ACCEDE DIRECTO AL MENÚ
-    print("Credenciales incorrectas. Intentá de nuevo.")
+                return  # ← Corregido: corta la función si el login fue exitoso
+
+    print("❌ Credenciales incorrectas. Intentá de nuevo.")
 
 def menu_acceso():
     while True:
@@ -146,10 +246,3 @@ def menu_acceso():
 
 inicializar_archivo_usuarios()
 menu_acceso()
-
-
-
-
-
-
-
