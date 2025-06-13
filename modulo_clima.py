@@ -7,7 +7,7 @@ import os
 load_dotenv()
 api_key = os.getenv("API_KEY")
 
-def obtener_clima(ciudad, api_key):
+def obtener_clima(ciudad):
     url = "https://api.openweathermap.org/data/2.5/weather"
     params = {
         'q': ciudad,

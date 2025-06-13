@@ -5,6 +5,10 @@ import re
 import requests
 import pandas as pd
 from datetime import datetime
+from modulo_clima import obtener_clima, guardar_en_historial, mostrar_clima
+from dotenv import load_dotenv
+import os
+load_dotenv() 
 
 ARCHIVO_USUARIOS = 'usuarios_simulados.csv'
 ARCHIVO_HISTORIAL = 'historial_global.csv'
@@ -49,53 +53,45 @@ def guardar_usuario(username, password):
         escritor = csv.writer(archivo)
         escritor.writerow([username, password])
 
-# ------------------ FUNCIONES CLIMA ------------------
+# ------------------ FUNCIONES CLIMA/HISTORIAL ------------------
 
-def obtener_clima(ciudad, api_key):
-    url = "https://api.openweathermap.org/data/2.5/weather"
-    params = {
-        'q': ciudad,
-        'appid': api_key,
-        'units': 'metric',
-        'lang': 'es'
-    }
-    try:
-        response = requests.get(url, params=params, timeout=10)
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        print(f"Error al consultar la API: {e}")
-        return None
-
-def guardar_en_historial(username, ciudad, datos):
-    fecha_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    temperatura = datos['main']['temp']
-    condicion = datos['weather'][0]['description']
-    humedad = datos['main']['humidity']
-    viento = datos['wind']['speed']
-    nuevo = not os.path.exists(ARCHIVO_HISTORIAL)
-    with open(ARCHIVO_HISTORIAL, mode='a', newline='') as archivo:
-        escritor = csv.writer(archivo)
-        if nuevo:
-            escritor.writerow(['username', 'ciudad', 'fecha_hora', 'temperatura', 'condicion_clima', 'humedad', 'viento'])
-        escritor.writerow([username, ciudad, fecha_hora, temperatura, condicion, humedad, viento])
-
-def consultar_clima_y_guardar(username, api_key):
+def consultar_clima_y_guardar(username):
     ciudad = input("Ingresá el nombre de la ciudad: ").strip()
-    datos = obtener_clima(ciudad, api_key)
+    datos = obtener_clima(ciudad)
+
     if datos:
-        try:
-            print("\n=== Clima Actual ===")
-            print(f"Ciudad: {ciudad}")
-            print(f"Temperatura: {datos['main']['temp']}°C")
-            print(f"Sensación térmica: {datos['main']['feels_like']}°C")
-            print(f"Humedad: {datos['main']['humidity']}%")
-            print(f"Condición: {datos['weather'][0]['description'].capitalize()}")
-            print(f"Viento: {datos['wind']['speed']} km/h")
-            guardar_en_historial(username, ciudad, datos)
-            print("✅ Consulta guardada en el historial.\n")
-        except KeyError:
-            print("❌ Error inesperado al procesar los datos de la API.")
+        mostrar_clima(datos)
+        guardar_en_historial(username, datos)
+        print("✅ Consulta guardada en el historial.")
+    else:
+        print("❌ No se pudo obtener el clima.")
+
+def ver_historial_personal(username):
+    if not os.path.exists('historial_global.csv'):
+        print("⚠️ Aún no hay historial guardado.")
+        return
+
+    historial = {}
+
+    with open('historial_global.csv', mode='r', newline='', encoding='utf-8') as archivo:
+        lector = csv.DictReader(archivo)
+        for fila in lector:
+            if fila['username'] == username:
+                ciudad = fila['ciudad']
+                if ciudad not in historial:
+                    historial[ciudad] = []
+                historial[ciudad].append(fila)
+
+    if not historial:
+        print(" No se encontraron registros para este usuario.")
+        return
+
+    print(f"\n📖 Historial de {username}:")
+    for ciudad, registros in historial.items():
+        print(f"\n🏙️ Ciudad: {ciudad}")
+        for r in registros:
+            print(f" - {r['fecha_hora']} | {r['temperatura']}°C | {r['descripcion'].capitalize()} | Humedad: {r['humedad']}% | Viento: {r['viento']} km/h")
+
 
 # ------------------ FUNCIONES EXTRA ------------------
 
@@ -143,7 +139,7 @@ def menu_principal(username):
         print("6. Cerrar sesión")
         opcion = input("Seleccioná una opción: ")
         if opcion == '1':
-            consultar_clima_y_guardar(username, "TU_API_KEY")
+            consultar_clima_y_guardar(username)
         elif opcion == '2':
             ver_historial_personal(username)
         elif opcion == '3':
@@ -220,7 +216,7 @@ def iniciar_sesion():
         lector = csv.DictReader(archivo)
         for fila in lector:
             if fila['username'] == username and fila['password_simulada'] == password:
-                print(f"Inicio de sesión exitoso. Bienvenido, {username}!")
+                print(f"Inicio de sesión exitoso. Bienvenido/a, {username}!")
                 menu_principal(username)
                 return
     print("❌ Credenciales incorrectas. Intentá de nuevo.")
