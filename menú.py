@@ -129,7 +129,7 @@ def menu_principal(username):
 
 
        if opcion == '1':
-           print("[Opción 1] Consultar clima (a implementar)")
+           print("[Opción 1] Consultar clima: ")
            ciudad = input("Ingrese el nombre de la ciudad: ")
            datos = obtener_clima(ciudad, api_key)
 
