@@ -3,6 +3,7 @@ import csv
 import os
 import re
 from modulo_clima import obtener_clima, mostrar_clima, guardar_en_historial
+from dotenv import load_dotenv
 load_dotenv()
 api_key = os.getenv("API_KEY")
 
