@@ -2,6 +2,7 @@
 import csv
 import os
 import re
+from modulo_clima import obtener_clima, mostrar_clima, guardar_en_historial
 
 
 ARCHIVO_USUARIOS = 'usuarios_simulados.csv'
@@ -127,6 +128,17 @@ def menu_principal(username):
 
        if opcion == '1':
            print("[Opción 1] Consultar clima (a implementar)")
+           ciudad = input("Ingrese el nombre de la ciudad: ")
+           datos = obtener_clima(ciudad, api_key)
+
+           if datos:
+               mostrar_clima(datos)
+               guardar_en_historial(nombre_usuario, datos)
+               print("Consulta guardada. ✅ ")
+           else:
+               print("No se pudo obtener el clima.")
+
+
        elif opcion == '2':
            print("[Opción 2] Ver historial personal (a implementar)")
            ver_historial_personal(username)
