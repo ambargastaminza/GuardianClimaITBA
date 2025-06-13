@@ -3,7 +3,8 @@ import csv
 import os
 import re
 from modulo_clima import obtener_clima, mostrar_clima, guardar_en_historial
-
+load_dotenv()
+api_key = os.getenv("API_KEY")
 
 ARCHIVO_USUARIOS = 'usuarios_simulados.csv'
 ARCHIVO_HISTORIAL = 'historial.csv'
