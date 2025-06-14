@@ -134,7 +134,7 @@ def mostrar_info_aplicacion():
     print("\n🙋 Desarrolladores:")
     print("- Barbás Delfina\n- Gastaminza Ámbar\n- Lee Angulo Osmary\n- López Antolin María\n- Saldivia Ramiro")
     print("\n🫂 Equipo de desarrollo:")
-    print("Nombre del grupo: [ELEGIR NOMBRE DEL GRUPO]")
+    print("Nombre del grupo: Aeolos")
 
 
 def menu_principal(username):
