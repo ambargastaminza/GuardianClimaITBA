@@ -6,15 +6,15 @@ import os
 
 # Cargar variables de entorno
 load_dotenv()
-api_key = os.getenv("API_KEY")
-if not api_key:
-    raise ValueError("⚠️ No se encontró la API_KEY en el archivo .env")
+api_key_clima = os.getenv("API_KEY_CLIMA")
+if not api_key_clima:
+    raise ValueError("⚠️ No se encontró la API_KEY_CLIMA en el archivo .env")
 
 def obtener_clima(ciudad):
     url = "https://api.openweathermap.org/data/2.5/weather"
     params = {
         'q': ciudad,
-        'appid': api_key,
+        'appid': api_key_clima,
         'units': 'metric',
         'lang': 'es'
     }

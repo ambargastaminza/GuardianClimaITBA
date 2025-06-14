@@ -5,6 +5,9 @@ import csv
 import os
 from obtener_clima import obtener_clima, guardar_en_historial, mostrar_clima
 import matplotlib.pyplot as plt
+from generativeIA import obtener_consejo_ia_gemini
+import os
+
 
 ARCHIVO_HISTORIAL = 'historial_global.csv'
 
@@ -92,7 +95,30 @@ def estadisticas_globales():
         plt.ylabel('')
         plt.tight_layout()
         plt.show()
-    
+
+
+def mostrar_consejo_ia(username):
+    api_key = os.getenv("API_KEY_GEMINI")
+    if not api_key:
+        print("❌ No se encontró la API KEY de Gemini. Verificá tu archivo .env")
+        return
+
+    ciudad = input("Ingresá el nombre de la ciudad para obtener un consejo de vestimenta: ").strip()
+    datos = obtener_clima(ciudad)
+
+    if not datos:
+        print("❌ No se pudo obtener el clima.")
+        return
+
+    temperatura = datos['temperatura']
+    condicion = datos['descripcion']
+    viento = datos['viento']
+    humedad = datos['humedad']
+
+    consejo = obtener_consejo_ia_gemini(api_key, temperatura, condicion, viento, humedad)
+    print(f"\n🧥 Consejo de vestimenta para hoy en {ciudad.capitalize()}:")
+    print(f"{consejo}")
+
 
 def mostrar_info_aplicacion():
     print("\n--- Acerca de GuardiánClima ITBA ---")
@@ -132,7 +158,7 @@ def menu_principal(username):
         elif opcion == '3':
             estadisticas_globales()
         elif opcion == '4':
-            print("[Opción 4] Consejo IA (a implementar)")
+            mostrar_consejo_ia(username)
         elif opcion == '5':
             mostrar_info_aplicacion()
         elif opcion == '6':
