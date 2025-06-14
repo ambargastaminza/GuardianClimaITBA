@@ -23,6 +23,7 @@ def obtener_consejo_ia_gemini(temperatura, condicion_clima, viento, humedad, tem
         return "⚠️ Velocidad de viento inválida."
     if not (isinstance(humedad, (int, float)) and 0 <= humedad <= 100):
         return "⚠️ Humedad inválida."
+    response = model.generate_content([prompt], temperature=temperatura_modelo)
 
     try:
         genai.configure(api_key=API_KEY_GEMINI)
