@@ -4,6 +4,7 @@ import pandas as pd
 import csv
 import os
 from obtener_clima import obtener_clima, guardar_en_historial, mostrar_clima
+import matplotlib.pyplot as plt
 
 ARCHIVO_HISTORIAL = 'historial_global.csv'
 
@@ -37,7 +38,6 @@ def ver_historial_personal(username):
     if not encontrado:
         print("No se encontraron consultas guardadas para este usuario.")
 
-
 def estadisticas_globales():
     if not os.path.exists(ARCHIVO_HISTORIAL):
         print("No hay historial para analizar.")
@@ -51,9 +51,47 @@ def estadisticas_globales():
     promedio_temp = df['temperatura'].mean()
     print(f"Temperatura promedio global: {promedio_temp:.1f}°C")
 
-    if input("¿Querés exportar el historial completo a Excel? (s/n): ").lower() == 's':
+    if input("\n¿Querés exportar el historial completo a Excel? (s/n): ").lower() == 's':
         df.to_excel("historial_exportado.xlsx", index=False)
         print("Historial exportado como 'historial_exportado.xlsx'")
+
+    # -------- GRÁFICOS --------
+    if input("\n¿Querés generar gráficos con los datos globales? (s/n): ").lower() == 's':
+        # 1. Gráfico de Barras: cantidad de consultas por ciudad
+        plt.figure(figsize=(10, 5))
+        df['ciudad'].value_counts().plot(kind='bar', color='skyblue')
+        plt.title('Consultas por Ciudad')
+        plt.xlabel('Ciudad')
+        plt.ylabel('Cantidad de consultas')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.show()
+
+        # 2. Gráfico de Líneas: temperatura a lo largo del tiempo para una ciudad específica
+        ciudad_elegida = input("Para el gráfico de líneas, ingresá una ciudad: ").strip()
+        df_ciudad = df[df['ciudad'].str.lower() == ciudad_elegida.lower()]
+        if not df_ciudad.empty:
+            df_ciudad['fecha_hora'] = pd.to_datetime(df_ciudad['fecha_hora'])
+            df_ciudad = df_ciudad.sort_values('fecha_hora')
+            plt.figure(figsize=(10, 5))
+            plt.plot(df_ciudad['fecha_hora'], df_ciudad['temperatura'], marker='o')
+            plt.title(f"Tendencia de Temperatura en {ciudad_elegida.capitalize()}")
+            plt.xlabel('Fecha y Hora')
+            plt.ylabel('Temperatura (°C)')
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+            plt.show()
+        else:
+            print(f"No hay suficientes datos para la ciudad '{ciudad_elegida}'.")
+
+        # 3. Gráfico de Torta: distribución de condiciones climáticas
+        condiciones = df['descripcion'].str.capitalize().value_counts()
+        plt.figure(figsize=(6, 6))
+        condiciones.plot(kind='pie', autopct='%1.1f%%', startangle=90)
+        plt.title("Distribución de Condiciones Climáticas")
+        plt.ylabel('')
+        plt.tight_layout()
+        plt.show()
 
 
 def mostrar_info_aplicacion():

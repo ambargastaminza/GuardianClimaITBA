@@ -5,6 +5,7 @@ import os
 import re
 from dotenv import load_dotenv
 from menu_principal import menu_principal
+from seguridad import hashear_contrasena, verificar_contrasena
 
 load_dotenv()
 
@@ -32,11 +33,11 @@ def inicializar_archivo_usuarios():
     if not os.path.exists(ARCHIVO_USUARIOS):
         with open(ARCHIVO_USUARIOS, mode='w', newline='') as archivo:
             escritor = csv.writer(archivo)
-            escritor.writerow(['username', 'password_simulada'])
+            escritor.writerow(['username', 'password_hash'])
 
 def existe_usuario(username):
     if not os.path.exists(ARCHIVO_USUARIOS):
-        return False  # archivo no existe => usuario no puede existir
+        return False
     with open(ARCHIVO_USUARIOS, mode='r', newline='') as archivo:
         lector = csv.DictReader(archivo)
         for fila in lector:
@@ -44,16 +45,17 @@ def existe_usuario(username):
                 return True
     return False
 
-def guardar_usuario(username, password):
+def guardar_usuario(username, password_plano):
+    password_hash = hashear_contrasena(password_plano)
     with open(ARCHIVO_USUARIOS, mode='a', newline='') as archivo:
         escritor = csv.writer(archivo)
-        escritor.writerow([username, password])
+        escritor.writerow([username, password_hash])
 
 # ------------------ FLUJO DE ACCESO ------------------
 
 def registrar_usuario():
     print("\n--- Registro de Nuevo Usuario ---")
-    username = input("Elegí un nombre de usuario: ")
+    username = input("Elegí un nombre de usuario: ").strip
     if existe_usuario(username):
         print("Ese nombre de usuario ya está registrado. Probá con otro.")
         return
@@ -70,22 +72,32 @@ def registrar_usuario():
             for error in errores:
                 print(f" - Debe {error}")
             print("🔐 Recomendación: Usá una combinación de letras mayúsculas, minúsculas, números y símbolos.")
+    if not username:
+        print("⚠️ El nombre de usuario no puede estar vacío.")
+        return
 
 def iniciar_sesion():
     if not os.path.exists(ARCHIVO_USUARIOS):
         print("⚠️ No hay usuarios registrados aún.")
         return
+
     print("\n--- Iniciar Sesión ---")
     username = input("Usuario: ")
     password = input("Contraseña: ")
+
     with open(ARCHIVO_USUARIOS, mode='r', newline='') as archivo:
         lector = csv.DictReader(archivo)
         for fila in lector:
-            if fila['username'] == username and fila['password_simulada'] == password:
-                print(f"Inicio de sesión exitoso. Bienvenido/a, {username}!")
-                menu_principal(username)
-                return
-    print("❌ Credenciales incorrectas. Intentá de nuevo.")
+            if fila['username'] == username:
+                if verificar_contrasena(password, fila['password_hash']):
+                    print(f"Inicio de sesión exitoso. Bienvenido/a, {username}!")
+                    menu_principal(username)
+                    return
+                else:
+                    print("❌ Contraseña incorrecta.")
+                    return
+
+    print("❌ Usuario no encontrado.")
 
 def menu_acceso():
     inicializar_archivo_usuarios()
