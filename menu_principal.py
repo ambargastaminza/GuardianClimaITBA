@@ -65,7 +65,6 @@ def ver_historial_por_fecha(username):
                 if inicio <= fecha_consulta <= fin:
                     print(f"{fila['fecha_hora']} | {fila['ciudad']} |_]()
 
-
 def estadisticas_globales():
     if not os.path.exists(ARCHIVO_HISTORIAL):
         print("No hay historial para analizar.")
@@ -82,6 +81,23 @@ def estadisticas_globales():
     if input("\n¿Querés exportar el historial completo a Excel? (s/n): ").lower() == 's':
         df.to_excel("historial_exportado.xlsx", index=False)
         print("Historial exportado como 'historial_exportado.xlsx'")
+
+def exportar_historial_usuario(username):
+    if not os.path.exists(ARCHIVO_HISTORIAL):
+        print("No hay historial para exportar.")
+        return
+
+    df = pd.read_csv(ARCHIVO_HISTORIAL)
+    df_usuario = df[df['username'] == username]
+
+    if df_usuario.empty:
+        print("No hay datos para exportar.")
+        return
+
+    nombre_archivo = f"historial_{username}.xlsx"
+    df_usuario.to_excel(nombre_archivo, index=False)
+    print(f"Historial personal exportado a {nombre_archivo}")
+
 
     # -------- GRÁFICOS --------
     if input("\n¿Querés generar gráficos con los datos globales? (s/n): ").lower() == 's':
