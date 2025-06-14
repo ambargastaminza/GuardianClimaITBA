@@ -35,16 +35,18 @@ def inicializar_archivo_usuarios():
             escritor.writerow(['username', 'password_hash']) 
 
 def existe_usuario(username):
+    username = username.lower()  # 🔁 normalizar para comparación
     if not os.path.exists(ARCHIVO_USUARIOS):
         return False
     with open(ARCHIVO_USUARIOS, mode='r', newline='', encoding='utf-8') as archivo:
         lector = csv.DictReader(archivo)
         for fila in lector:
-            if fila['username'] == username:
+            if fila['username'].lower() == username:
                 return True
     return False
 
 def guardar_usuario(username, password_plano):
+    username = username.lower()  # 🔁 guardar siempre en minúsculas
     password_hash = hashear_contrasena(password_plano)
     with open(ARCHIVO_USUARIOS, mode='a', newline='', encoding='utf-8') as archivo:
         escritor = csv.writer(archivo)
@@ -67,7 +69,7 @@ def registrar_usuario():
         if es_valida:
             guardar_usuario(username, password)
             print(f"Usuario '{username}' registrado con éxito.", flush=True)
-            menu_principal(username)
+            menu_principal(username.lower())  # 🔁 acceso consistente en minúsculas
             break
         else:
             print("\n❌ Tu contraseña no cumple con los siguientes criterios:")
@@ -81,13 +83,13 @@ def iniciar_sesion():
         return
 
     print("\n--- Iniciar Sesión ---")
-    username = input("Usuario: ").strip()
+    username = input("Usuario: ").strip().lower()  # 🔁 entrada normalizada
     password = input("Contraseña: ")
 
     with open(ARCHIVO_USUARIOS, mode='r', newline='', encoding='utf-8') as archivo:
         lector = csv.DictReader(archivo)
         for fila in lector:
-            if fila['username'] == username:
+            if fila['username'].lower() == username:  # 🔁 comparación sin importar mayúsculas
                 if verificar_contrasena(password, fila['password_hash']):
                     print(f"Inicio de sesión exitoso. Bienvenido/a, {username}!", flush=True)
                     menu_principal(username)
@@ -115,3 +117,4 @@ def menu_acceso():
             break
         else:
             print("Opción inválida. Intenta nuevamente.")
+
