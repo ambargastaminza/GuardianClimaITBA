@@ -203,3 +203,12 @@ def menu_principal(username):
         if volver != 's':
             print("Cerrando sesión...")
             break
+
+    while True:
+        volver = input("\n¿Deseás volver al menú principal? (s/n): ").strip().lower()
+        if volver in ['s', 'n']:
+            break
+        print("Respuesta inválida. Escribí 's' para sí o 'n' para no.")
+        if volver != 's':
+            print("Cerrando sesión...")
+            break
