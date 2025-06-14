@@ -1,2 +1,5 @@
-API_KEY_CLIMA=363ce8ea8f507c0f964184dfd7137bd1
-API_KEY_GEMINI=AIzaSyBETix567dg5fwEyfWp9dFEUWRTgbF5eno
+.env
+__pycache__/
+*.pyc
+
+

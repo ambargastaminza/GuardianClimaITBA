@@ -3,13 +3,10 @@
 import pandas as pd
 import csv
 import os
-from obtener_clima import obtener_clima, guardar_en_historial, mostrar_clima
+from obtener_clima import obtener_clima, guardar_en_historial, mostrar_clima, ARCHIVO_HISTORIAL
 import matplotlib.pyplot as plt
 from generativeIA import obtener_consejo_ia_gemini
 import os
-
-
-ARCHIVO_HISTORIAL = 'historial_global.csv'
 
 
 def consultar_clima_y_guardar(username):
@@ -143,12 +140,12 @@ def mostrar_info_aplicacion():
 def menu_principal(username):
     while True:
         print(f"\n=== Menú Principal - Bienvenido/a, {username} ===")
-        print("1. Consultar clima actual y guardar en historial")
-        print("2. Ver mi historial personal por ciudad")
-        print("3. Ver estadísticas globales y exportar historial")
-        print("4. Consejo IA: ¿Cómo me visto hoy?")
-        print("5. Acerca de GuardiánClima ITBA")
-        print("6. Cerrar sesión")
+        print("1. 🌤️ Consultar clima actual y guardar en historial")
+        print("2. 🗂️ Ver mi historial personal por ciudad")
+        print("3. 📊 Ver estadísticas globales y exportar historial")
+        print("4. 🪄 Vestite según el clima (versión IA)")
+        print("5. ℹ️ Acerca de GuardiánClima ITBA")
+        print("6. 🚪 Cerrar sesión")
         opcion = input("Seleccioná una opción: ")
 
         if opcion == '1':
