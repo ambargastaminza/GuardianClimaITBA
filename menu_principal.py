@@ -204,13 +204,16 @@ def mostrar_info_aplicacion():
 
 def menu_principal(username):
     while True:
-        print(f"\n=== Menú Principal - Bienvenido/a, {username} ===")
-        print("1. 🌤️ Consultar clima actual y guardar en historial")
-        print("2. 🗂️ Ver mi historial personal por ciudad")
-        print("3. 📊 Ver estadísticas globales y exportar historial")
-        print("4. 🪄 Vestite según el clima (versión IA)")
-        print("5. ℹ️ Acerca de GuardiánClima ITBA")
-        print("6. 🚪 Cerrar sesión")
+        print(f"\nMenú Principal - Bienvenido/a {username}")
+        print("1. Consultar clima y guardar en historial")
+        print("2. Ver historial personal por ciudad")
+        print("3. Ver historial personal por rango de fechas")
+        print("4. Exportar mi historial personal a Excel")
+        print("5. Estadísticas globales y exportar historial completo")
+        print("6. Mostrar consejo de vestimenta con IA")
+        print("7. Acerca de GuardiánClima ITBA")
+        print("8. Cerrar sesión")
+
         opcion = input("Seleccioná una opción: ")
 
         if opcion == '1':
@@ -218,12 +221,16 @@ def menu_principal(username):
         elif opcion == '2':
             ver_historial_personal(username)
         elif opcion == '3':
-            estadisticas_globales()
+            ver_historial_por_fecha(username)
         elif opcion == '4':
-            mostrar_consejo_ia(username)
+            exportar_historial_usuario(username)
         elif opcion == '5':
-            mostrar_info_aplicacion()
+            estadisticas_globales()
         elif opcion == '6':
+            mostrar_consejo_ia(username)
+        elif opcion == '7':
+            mostrar_info_aplicacion()
+        elif opcion == '8':
             print("Cerrando sesión...")
             break
         else:
