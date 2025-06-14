@@ -32,7 +32,7 @@ def inicializar_archivo_usuarios():
     if not os.path.exists(ARCHIVO_USUARIOS):
         with open(ARCHIVO_USUARIOS, mode='w', newline='', encoding='utf-8') as archivo:
             escritor = csv.writer(archivo)
-            escritor.writerow(['username', 'password_hash'])  
+            escritor.writerow(['username', 'password_hash']) 
 
 def existe_usuario(username):
     if not os.path.exists(ARCHIVO_USUARIOS):
