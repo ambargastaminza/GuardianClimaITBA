@@ -31,7 +31,7 @@ def validar_contrasena(password):
 
 def inicializar_archivo_usuarios():
     if not os.path.exists(ARCHIVO_USUARIOS):
-        with open(ARCHIVO_USUARIOS, mode='w', newline='') as archivo:
+        with open(ARCHIVO_USUARIOS, mode='a', newline='') as archivo:
             escritor = csv.writer(archivo)
             escritor.writerow(['username', 'password_hash'])
 
