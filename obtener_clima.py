@@ -4,13 +4,12 @@ from datetime import datetime
 from dotenv import load_dotenv
 import os
 
-# Cargar variables de entorno
 load_dotenv()
 api_key_clima = os.getenv("API_KEY_CLIMA")
 if not api_key_clima:
     raise ValueError("⚠️ No se encontró la API_KEY_CLIMA en el archivo .env")
 
-# Definir la ruta absoluta al archivo de historial, en la misma carpeta del script
+
 ARCHIVO_HISTORIAL = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'historial_global.csv')
 
 def obtener_clima(ciudad):

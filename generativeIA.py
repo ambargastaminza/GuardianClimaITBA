@@ -1,6 +1,13 @@
 ##  GENERATIVE IA
 
 import google.generativeai as genai
+from dotenv import load_dotenv
+import os 
+
+load_dotenv()
+api_key_gemini = os.getenv("API_KEY_GEMINI")
+if not api_key_gemini:
+    raise ValueError("⚠️ No se encontró la API_KEY_GEMINI en el archivo .env")
 
 def obtener_consejo_ia_gemini(api_key_gemini, temperatura, condicion_clima, viento, humedad):
     try:
