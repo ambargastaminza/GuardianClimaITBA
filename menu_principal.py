@@ -38,6 +38,34 @@ def ver_historial_personal(username):
     if not encontrado:
         print("No se encontraron consultas guardadas para este usuario.")
 
+def ver_historial_por_fecha(username):
+    if not os.path.exists(ARCHIVO_HISTORIAL):
+        print("No hay historial disponible.")
+        return
+
+    fecha_inicio = input("Ingresá fecha inicio (YYYY-MM-DD): ").strip()
+    fecha_fin = input("Ingresá fecha fin (YYYY-MM-DD): ").strip()
+    try:
+        inicio = datetime.datetime.strptime(fecha_inicio, "%Y-%m-%d").date()
+        fin = datetime.datetime.strptime(fecha_fin, "%Y-%m-%d").date()
+    except ValueError:
+        print("Formato de fecha inválido.")
+        return
+
+    if inicio > fin:
+        print("La fecha inicio debe ser menor o igual a fecha fin.")
+        return
+
+    encontrado = False
+    with open(ARCHIVO_HISTORIAL, mode='r', newline='') as archivo:
+        lector = csv.DictReader(archivo)
+        for fila in lector:
+            if fila['username'] == username:
+                fecha_consulta = datetime.datetime.strptime(fila['fecha_hora'], "%Y-%m-%d %H:%M:%S").date()
+                if inicio <= fecha_consulta <= fin:
+                    print(f"{fila['fecha_hora']} | {fila['ciudad']} |_]()
+
+
 def estadisticas_globales():
     if not os.path.exists(ARCHIVO_HISTORIAL):
         print("No hay historial para analizar.")
