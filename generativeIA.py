@@ -50,6 +50,7 @@ def obtener_consejo_ia_gemini(temperatura, condicion_clima, viento, humedad, tem
             return "No se pudo generar un consejo en este momento."
 
     except Exception as e:
+        logging.error(f"Error al generar consejo IA: {e}")
         if "quota" in str(e).lower():
             return "🚫 Límite de uso alcanzado. Intentá más tarde o usá otra API key."
         return f"⚠️ Error al generar el consejo de IA: {e}"
