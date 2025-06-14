@@ -196,3 +196,10 @@ def menu_principal(username):
             break
         else:
             print("Opción inválida. Intentá de nuevo.")
+            continue  # Repite el menú si se ingresó una opción inválida
+
+        # PREGUNTA SI QUIERE VOLVER AL MENÚ PRINCIPAL
+        volver = input("\n¿Deseás volver al menú principal? (s/n): ").lower()
+        if volver != 's':
+            print("Cerrando sesión...")
+            break
