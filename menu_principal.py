@@ -92,7 +92,7 @@ def estadisticas_globales():
         plt.ylabel('')
         plt.tight_layout()
         plt.show()
-
+    
 
 def mostrar_info_aplicacion():
     print("\n--- Acerca de GuardiánClima ITBA ---")
