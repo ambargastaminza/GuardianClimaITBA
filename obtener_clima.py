@@ -10,6 +10,9 @@ api_key_clima = os.getenv("API_KEY_CLIMA")
 if not api_key_clima:
     raise ValueError("⚠️ No se encontró la API_KEY_CLIMA en el archivo .env")
 
+# Definir la ruta absoluta al archivo de historial, en la misma carpeta del script
+ARCHIVO_HISTORIAL = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'historial_global.csv')
+
 def obtener_clima(ciudad):
     url = "https://api.openweathermap.org/data/2.5/weather"
     params = {
@@ -40,8 +43,8 @@ def obtener_clima(ciudad):
         return None
 
 def guardar_en_historial(nombre_usuario, datos_clima):
-    archivo_existente = os.path.exists('historial_global.csv')
-    with open('historial_global.csv', mode='a', newline='', encoding='utf-8') as archivo:
+    archivo_existente = os.path.exists(ARCHIVO_HISTORIAL)
+    with open(ARCHIVO_HISTORIAL, mode='a', newline='', encoding='utf-8') as archivo:
         writer = csv.writer(archivo)
         if not archivo_existente:
             writer.writerow(['username', 'ciudad', 'fecha_hora', 'temperatura', 'descripcion', 'humedad', 'viento'])
