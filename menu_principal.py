@@ -7,6 +7,7 @@ from obtener_clima import obtener_clima, guardar_en_historial, mostrar_clima, AR
 import matplotlib.pyplot as plt
 from generativeIA import obtener_consejo_ia_gemini
 import os
+from datetime import datetime
 
 
 def consultar_clima_y_guardar(username):
@@ -71,33 +72,53 @@ def estadisticas_globales():
         return
 
     df = pd.read_csv(ARCHIVO_HISTORIAL)
-    print("\n--- Estadísticas Globales ---")
+    print("\nEstadísticas Globales")
     print("Cantidad total de consultas:", len(df))
     print("Ciudades más consultadas:")
     print(df['ciudad'].value_counts().head(5))
-    promedio_temp = df['temperatura'].mean()
-    print(f"Temperatura promedio global: {promedio_temp:.1f}°C")
+    print(f"Temperatura promedio global: {df['temperatura'].mean():.1f}°C")
 
-    if input("\n¿Querés exportar el historial completo a Excel? (s/n): ").lower() == 's':
+    usuarios_top = df['username'].value_counts().head(5)
+    print("\nUsuarios con más consultas:")
+    print(usuarios_top)
+
+    if input("\nExportar historial completo a Excel? (s/n): ").lower() == 's':
         df.to_excel("historial_exportado.xlsx", index=False)
         print("Historial exportado como 'historial_exportado.xlsx'")
 
-def exportar_historial_usuario(username):
-    if not os.path.exists(ARCHIVO_HISTORIAL):
-        print("No hay historial para exportar.")
-        return
+    if input("\nGenerar gráficos globales? (s/n): ").lower() == 's':
+        plt.figure(figsize=(10, 5))
+        df['ciudad'].value_counts().plot(kind='bar')
+        plt.title('Consultas por Ciudad')
+        plt.xlabel('Ciudad')
+        plt.ylabel('Cantidad de consultas')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.show()
 
-    df = pd.read_csv(ARCHIVO_HISTORIAL)
-    df_usuario = df[df['username'] == username]
+        ciudad_elegida = input("Ciudad para gráfico de temperatura en el tiempo: ").strip()
+        df_ciudad = df[df['ciudad'].str.lower() == ciudad_elegida.lower()]
+        if not df_ciudad.empty:
+            df_ciudad['fecha_hora'] = pd.to_datetime(df_ciudad['fecha_hora'])
+            df_ciudad = df_ciudad.sort_values('fecha_hora')
+            plt.figure(figsize=(10, 5))
+            plt.plot(df_ciudad['fecha_hora'], df_ciudad['temperatura'], marker='o')
+            plt.title(f"Tendencia de Temperatura en {ciudad_elegida.capitalize()}")
+            plt.xlabel('Fecha y Hora')
+            plt.ylabel('Temperatura (°C)')
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+            plt.show()
+        else:
+            print("No hay suficientes datos para esa ciudad.")
 
-    if df_usuario.empty:
-        print("No hay datos para exportar.")
-        return
-
-    nombre_archivo = f"historial_{username}.xlsx"
-    df_usuario.to_excel(nombre_archivo, index=False)
-    print(f"Historial personal exportado a {nombre_archivo}")
-
+        condiciones = df['descripcion'].str.capitalize().value_counts()
+        plt.figure(figsize=(6, 6))
+        condiciones.plot(kind='pie', autopct='%1.1f%%', startangle=90)
+        plt.title("Distribución de Condiciones Climáticas")
+        plt.ylabel('')
+        plt.tight_layout()
+        plt.show()
 
     # -------- GRÁFICOS --------
     if input("\n¿Querés generar gráficos con los datos globales? (s/n): ").lower() == 's':
