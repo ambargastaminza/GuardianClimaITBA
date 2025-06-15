@@ -28,6 +28,7 @@ def validar_contrasena(password):
     return (False, errores) if errores else (True, [])
 
 # ------------------ FUNCIONES DE ARCHIVO ------------------
+
 def inicializar_archivo_usuarios():
     if not os.path.exists(ARCHIVO_USUARIOS):
         with open(ARCHIVO_USUARIOS, mode='w', newline='', encoding='utf-8') as archivo:
