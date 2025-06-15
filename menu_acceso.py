@@ -55,21 +55,22 @@ def guardar_usuario(username, password_plano):
 # ------------------ FLUJO DE ACCESO ------------------
 
 def registrar_usuario():
-    print("\n--- Registro de Nuevo Usuario ---")
-    username = input("Elegí un nombre de usuario: ").strip()
+    print("\n¡Hora de registrarte!")
+    username = input("Elegí tu nombre de usuario: ").strip()
+
     if not username:
         print("⚠️ El nombre de usuario no puede estar vacío.")
         return
     if existe_usuario(username):
-        print("Ese nombre de usuario ya está registrado. Probá con otro.")
+        print("Ups... ese nombre ya está en uso. Probá con otro.")
         return
     while True:
         password = input("Ingresá una contraseña segura: ")
         es_valida, errores = validar_contrasena(password)
         if es_valida:
             guardar_usuario(username, password)
-            print(f"Usuario '{username}' registrado con éxito.", flush=True)
-            menu_principal(username.lower())  # 🔁 acceso consistente en minúsculas
+            print(f"🎉 ¡Listo, {username}! Tu cuenta fue creada con éxito.", flush=True)
+            menu_principal(username.lower())  
             break
         else:
             print("\n❌ Tu contraseña no cumple con los siguientes criterios:")
@@ -83,7 +84,7 @@ def iniciar_sesion():
         return
 
     print("\n--- Iniciar Sesión ---")
-    username = input("Usuario: ").strip().lower()  # 🔁 entrada normalizada
+    username = input("Usuario: ").strip().lower()  # entrada normalizada
     password = input("Contraseña: ")
 
     with open(ARCHIVO_USUARIOS, mode='r', newline='', encoding='utf-8') as archivo:
@@ -95,15 +96,16 @@ def iniciar_sesion():
                     menu_principal(username)
                     return
                 else:
-                    print("❌ Contraseña incorrecta.")
+                    print("❌ Contraseña incorrecta. Volvé a intentarlo")
                     return
 
-    print("❌ Usuario no encontrado.")
+    print("❌ No encontramos ese usuario.")
+    print("¿Seguro que te registraste?")
 
 def menu_acceso():
     inicializar_archivo_usuarios()
     while True:
-        print("\n=== GuardiánClima ITBA ===")
+        print("\n=== Accedé a GuardiánClima ITBA ☀️ ===")
         print("1. Iniciar Sesión")
         print("2. Registrar Nuevo Usuario")
         print("3. Salir")
