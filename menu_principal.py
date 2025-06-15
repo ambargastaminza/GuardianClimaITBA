@@ -58,13 +58,13 @@ def ver_historial_por_fecha(username):
     with open(ARCHIVO_HISTORIAL, mode='r', encoding='utf-8') as archivo:
         lector = csv.DictReader(archivo)
         for fila in lector:
-            if fila['username'] == username:
+            if fila['username'].strip().lower() == username.strip().lower():
                 try:
-                    fecha_consulta = datetime.datetime.strptime(fila['fecha_hora'], "%Y-%m-%d %H:%M:%S").date()
+                    fecha_consulta = datetime.datetime.fromisoformat(fila['fecha_hora'].strip()).date()
                 except ValueError:
                     continue
                 if inicio <= fecha_consulta <= fin:
-                    print(f"{fila['fecha_hora']} | {fila['ciudad']} | {fila['temperatura']}°C | {fila['descripcion'].capitalize()}")
+                    print(f"{fila['username']} | {fila['ciudad']} | {fila['fecha_hora']} | {fila['temperatura']}°C | {fila['descripcion'].capitalize()} | Humedad: {fila['humedad']}% | Viento: {fila['viento']} km/h")
                     encontrado = True
 
     if not encontrado:
