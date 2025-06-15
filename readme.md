@@ -26,7 +26,9 @@ GuardiánClima ITBA es una aplicación de consola desarrollada en Python como pa
   - [OpenWeatherMap](https://openweathermap.org/) — Para obtener datos meteorológicos.
   - [Google Gemini](https://aistudio.google.com/) — Para generar consejos de vestimenta con IA.
 
------------------------------------
+
+**---------------------------------**
+
 
 # Instalación y Ejecución
 
