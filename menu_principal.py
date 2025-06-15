@@ -18,7 +18,7 @@ def consultar_clima_y_guardar(username):
             guardar_en_historial(username, datos)
             print("Consulta guardada en el historial.")
         else:
-            print("No se pudo obtener el clima. Volvé a intentarlo.")
+            print("No se pudo obtener el clima. Volvé a intentar insertando sólo el nombre de una ciudad.")
 
         if not preguntar_repetir_accion():
             break
@@ -68,13 +68,13 @@ def ver_historial_por_fecha(username):
         with open(ARCHIVO_HISTORIAL, mode='r', encoding='utf-8') as archivo:
             lector = csv.DictReader(archivo)
             for fila in lector:
-                if fila['username'] == username:
+                if fila['username'].strip().lower() == username.strip().lower():
                     try:
-                        fecha_consulta = datetime.datetime.strptime(fila['fecha_hora'], "%Y-%m-%d %H:%M:%S").date()
+                        fecha_consulta = datetime.datetime.fromisoformat(fila['fecha_hora'].strip()).date()
                     except ValueError:
                         continue
                     if inicio <= fecha_consulta <= fin:
-                        print(f"{fila['fecha_hora']} | {fila['ciudad']} | {fila['temperatura']}°C | {fila['descripcion'].capitalize()}")
+                        print(f"{fila['username']} | {fila['ciudad']} | {fila['fecha_hora']} | {fila['temperatura']}°C | {fila['descripcion'].capitalize()} | Humedad: {fila['humedad']}% | Viento: {fila['viento']} km/h")
                         encontrado = True
 
         if not encontrado:
@@ -227,10 +227,17 @@ def preguntar_volver_o_salir():
         if volver == 's':
             return
         elif volver == 'n':
-            print("Cerrando sesión...")
-            exit()
+            confirmar = input("¿Seguro que querés cerrar sesión? (s/n): ").strip().lower()
+            if confirmar == 's':
+                print("Cerrando sesión...")
+                exit()
+            elif confirmar == 'n':
+                continue  
+            else:
+                print("Respuesta inválida. Escribí 's' para sí o 'n' para no.")
         else:
             print("Respuesta inválida. Escribí 's' para sí o 'n' para no.")
+
 
 def preguntar_repetir_accion(pregunta="¿Querés repetir esta acción?"):
     while True:
