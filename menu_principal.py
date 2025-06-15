@@ -19,7 +19,7 @@ def consultar_clima_y_guardar(username):
         print("No se pudo obtener el clima.")
 
 def ver_historial_personal(username):
-    print(f"\nHistorial de consultas de {username}")
+    print(f"\n🗂️ Historial de consultas de {username}")
     if not os.path.exists(ARCHIVO_HISTORIAL):
         print("No hay historial disponible.")
         return
@@ -42,29 +42,34 @@ def ver_historial_por_fecha(username):
 
     fecha_inicio = input("Ingresá fecha inicio (YYYY-MM-DD): ").strip()
     fecha_fin = input("Ingresá fecha fin (YYYY-MM-DD): ").strip()
+
     try:
-        inicio = datetime.datetime.strptime(fecha_inicio, "%Y-%m-%d")
-        fin = datetime.datetime.strptime(fecha_fin, "%Y-%m-%d")
+        inicio = datetime.datetime.strptime(fecha_inicio, "%Y-%m-%d").date()
+        fin = datetime.datetime.strptime(fecha_fin, "%Y-%m-%d").date()
     except ValueError:
-        print("Formato de fecha inválido.")
+        print("⚠️ Formato de fecha inválido. Usá YYYY-MM-DD.")
         return
 
     if inicio > fin:
-        print("La fecha inicio debe ser menor o igual a fecha fin.")
+        print("⚠️ La fecha de inicio debe ser menor o igual a la fecha de fin.")
         return
 
     encontrado = False
-    with open(ARCHIVO_HISTORIAL, mode='r', newline='') as archivo:
+    with open(ARCHIVO_HISTORIAL, mode='r', encoding='utf-8') as archivo:
         lector = csv.DictReader(archivo)
         for fila in lector:
             if fila['username'] == username:
-                fecha_consulta = datetime.datetime.strptime(fila['fecha_hora'], "%Y-%m-%d %H:%M:%S")
-                if inicio <= fecha_consulta.date() <= fin:
+                try:
+                    fecha_consulta = datetime.datetime.strptime(fila['fecha_hora'], "%Y-%m-%d %H:%M:%S").date()
+                except ValueError:
+                    continue
+                if inicio <= fecha_consulta <= fin:
                     print(f"{fila['fecha_hora']} | {fila['ciudad']} | {fila['temperatura']}°C | {fila['descripcion'].capitalize()}")
                     encontrado = True
 
     if not encontrado:
-        print("No hay consultas en el rango de fechas indicado.")
+        print("⚠️ No se encontraron consultas para ese rango de fechas.")
+
 
 def estadisticas_globales():
     if not os.path.exists(ARCHIVO_HISTORIAL):
@@ -143,9 +148,25 @@ def mostrar_consejo_ia(username):
     print(consejo)
 
 def mostrar_info_aplicacion():
-    print("\nAcerca de GuardiánClima ITBA")
-    print("Herramienta para consultar clima, guardar historial, analizar patrones y obtener consejos IA.")
-    print("Funciones para usuarios y administradores para optimizar uso y experiencia.")
+    print("\n--- Acerca de GuardiánClima ITBA ---")
+    print("GuardiánClima ITBA es una herramienta pensada para ayudarte a enfrentar el día con información precisa y relevante.")
+    print("Permite consultar el clima en tiempo real, guardar tu historial de búsquedas, analizar patrones y obtener consejos útiles de vestimenta usando inteligencia artificial.")
+    print("Diseñada con foco en la experiencia del usuario, combina programación, análisis de datos y tecnologías actuales para ofrecer una solución simple, funcional y con proyección real.")
+    print("\n¿Cómo se usa?")
+    print("- Menú de Acceso: podés iniciar sesión o registrarte.")
+    print("- Menú Principal:")
+    print("  - Consulta del clima y guardado en historial global.")
+    print("  - Visualización del historial personal.")
+    print("  - Estadísticas globales y exportación del historial.")
+    print("  - Consejo de vestimenta basado en IA (próximamente).")
+    print("  - Información general de la aplicación.")
+    print("  - Cierre de sesión.")
+    print("\n🫂 Equipo de desarrollo:")
+    print("Nombre del grupo: FALTA!!")
+    print("\n🙋 Desarrolladores:")
+    print("- Barbás Delfina\n- Gastaminza Ámbar\n- Lee Angulo Osmary\n- López Antolin María\n- Saldivia Ramiro")
+   
+
 
 def exportar_historial_usuario(username):
     if not os.path.exists(ARCHIVO_HISTORIAL):
@@ -163,15 +184,26 @@ def exportar_historial_usuario(username):
     df_usuario.to_excel(nombre_archivo, index=False)
     print(f"Historial personal exportado a {nombre_archivo}")
 
+def preguntar_volver_o_salir():
+    while True:
+        volver = input("\n¿Deseás volver al menú principal? (s/n): ").strip().lower()
+        if volver == 's':
+            return
+        elif volver == 'n':
+            print("Cerrando sesión...")
+            exit()
+        else:
+            print("Respuesta inválida. Escribí 's' para sí o 'n' para no.")
+
 def menu_principal(username):
     while True:
         print(f"\nMenú Principal - Bienvenido/a {username}")
-        print("1. Consultar clima y guardar en historial")
+        print("1. 🌤️ Consultar clima y guardar en historial")
         print("2. Ver historial personal por ciudad")
         print("3. Ver historial personal por rango de fechas")
         print("4. Exportar mi historial personal a Excel")
         print("5. Estadísticas globales y exportar historial completo")
-        print("6. Mostrar consejo de vestimenta con IA")
+        print("6. 🪄 Vestite según el clima (versión IA)")
         print("7. Acerca de GuardiánClima ITBA")
         print("8. Cerrar sesión")
 
@@ -179,36 +211,27 @@ def menu_principal(username):
 
         if opcion == '1':
             consultar_clima_y_guardar(username)
+            preguntar_volver_o_salir()
         elif opcion == '2':
             ver_historial_personal(username)
+            preguntar_volver_o_salir()
         elif opcion == '3':
             ver_historial_por_fecha(username)
+            preguntar_volver_o_salir()
         elif opcion == '4':
             exportar_historial_usuario(username)
+            preguntar_volver_o_salir()
         elif opcion == '5':
             estadisticas_globales()
+            preguntar_volver_o_salir()
         elif opcion == '6':
             mostrar_consejo_ia(username)
+            preguntar_volver_o_salir()
         elif opcion == '7':
             mostrar_info_aplicacion()
+            preguntar_volver_o_salir()
         elif opcion == '8':
             print("Cerrando sesión...")
             break
         else:
             print("Opción inválida. Intentá de nuevo.")
-            continue  # Repite el menú si se ingresó una opción inválida
-
-        # PREGUNTA SI QUIERE VOLVER AL MENÚ PRINCIPAL
-        volver = input("\n¿Deseás volver al menú principal? (s/n): ").lower()
-        if volver != 's':
-            print("Cerrando sesión...")
-            break
-
-    while True:
-        volver = input("\n¿Deseás volver al menú principal? (s/n): ").strip().lower()
-        if volver in ['s', 'n']:
-            break
-        print("Respuesta inválida. Escribí 's' para sí o 'n' para no.")
-        if volver != 's':
-            print("Cerrando sesión...")
-            break
