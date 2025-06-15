@@ -1,0 +1,7 @@
+python-dotenv
+bcrypt
+matplotlib
+google-generativeai
+requests
+pandas
+openpyxl
