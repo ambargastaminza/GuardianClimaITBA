@@ -18,13 +18,15 @@ def obtener_consejo_ia_gemini(api_key_gemini, temperatura, condicion_clima, vien
         model = genai.GenerativeModel('gemini-1.5-flash')
 
         prompt = (
-            f"Genera un consejo breve, neutral y útil de vestimenta para una persona "
-            f"en las siguientes condiciones:\n"
+            f"Genera un consejo útil de vestimenta para una persona "
+            f"en las siguientes condiciones climáticas:\n"
             f"- Temperatura: {temperatura}°C\n"
             f"- Clima: {condicion_clima}\n"
             f"- Viento: {viento} km/h\n"
             f"- Humedad: {humedad}%\n"
             f"El consejo debe ser claro, directo y aplicable a cualquier contexto urbano."
+            f"Sería pertinente que agregues la informacion sobre el clima"
+            f"y seas muy simpático. Agrega emojis."
         )
 
         print("\n🧠 Generando consejo de vestimenta con IA...")
