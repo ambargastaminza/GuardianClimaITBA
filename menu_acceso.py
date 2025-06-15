@@ -1,4 +1,4 @@
-## MENÚ DE ACCESO - GuardianClimaITBA
+## MENÚ DE ACCESO 
 
 import csv
 import os
@@ -28,6 +28,7 @@ def validar_contrasena(password):
     return (False, errores) if errores else (True, [])
 
 # ------------------ FUNCIONES DE ARCHIVO ------------------
+
 def inicializar_archivo_usuarios():
     if not os.path.exists(ARCHIVO_USUARIOS):
         with open(ARCHIVO_USUARIOS, mode='w', newline='', encoding='utf-8') as archivo:
@@ -35,16 +36,18 @@ def inicializar_archivo_usuarios():
             escritor.writerow(['username', 'password_hash']) 
 
 def existe_usuario(username):
+    username = username.lower()  
     if not os.path.exists(ARCHIVO_USUARIOS):
         return False
     with open(ARCHIVO_USUARIOS, mode='r', newline='', encoding='utf-8') as archivo:
         lector = csv.DictReader(archivo)
         for fila in lector:
-            if fila['username'] == username:
+            if fila['username'].lower() == username:
                 return True
     return False
 
 def guardar_usuario(username, password_plano):
+    username = username.lower()  
     password_hash = hashear_contrasena(password_plano)
     with open(ARCHIVO_USUARIOS, mode='a', newline='', encoding='utf-8') as archivo:
         escritor = csv.writer(archivo)
@@ -52,28 +55,32 @@ def guardar_usuario(username, password_plano):
 
 # ------------------ FLUJO DE ACCESO ------------------
 
+
 def registrar_usuario():
-    print("\n--- Registro de Nuevo Usuario ---")
-    username = input("Elegí un nombre de usuario: ").strip()
+    print("\n¡Hora de registrarte!")
+    username = input("Elegí tu nombre de usuario: ").strip()
+
     if not username:
         print("⚠️ El nombre de usuario no puede estar vacío.")
         return
     if existe_usuario(username):
-        print("Ese nombre de usuario ya está registrado. Probá con otro.")
+        print("Ups... ese nombre ya está en uso. Probá con otro.")
         return
     while True:
-        password = input("Ingresá una contraseña segura: ")
+        print("🔐 Elegí una contraseña segura:")
+        print("Debe tener al menos 8 caracteres, incluir mayúsculas, números y símbolos como ($%&!).")
+        password = input("Ingresá tu contraseña: ")
         es_valida, errores = validar_contrasena(password)
         if es_valida:
             guardar_usuario(username, password)
-            print(f"Usuario '{username}' registrado con éxito.", flush=True)
-            menu_principal(username)
+            print(f"\n¡Listo, {username}! Tu cuenta fue creada con éxito.", flush=True)
+            menu_principal(username.lower())  
             break
         else:
             print("\n❌ Tu contraseña no cumple con los siguientes criterios:")
             for error in errores:
                 print(f" - Debe {error}")
-            print("🔐 Recomendación: Usá una combinación de letras mayúsculas, minúsculas, números y símbolos.")
+            print("Recomendación: Usá una combinación de letras mayúsculas, minúsculas, números y símbolos.")
 
 def iniciar_sesion():
     if not os.path.exists(ARCHIVO_USUARIOS):
@@ -81,29 +88,35 @@ def iniciar_sesion():
         return
 
     print("\n--- Iniciar Sesión ---")
-    username = input("Usuario: ").strip()
-    password = input("Contraseña: ")
+    username = input("Usuario: ").strip().lower()
 
     with open(ARCHIVO_USUARIOS, mode='r', newline='', encoding='utf-8') as archivo:
-        lector = csv.DictReader(archivo)
+        lector = list(csv.DictReader(archivo))
         for fila in lector:
-            if fila['username'] == username:
-                if verificar_contrasena(password, fila['password_hash']):
-                    print(f"Inicio de sesión exitoso. Bienvenido/a, {username}!", flush=True)
-                    menu_principal(username)
-                    return
-                else:
-                    print("❌ Contraseña incorrecta.")
-                    return
+            if fila['username'].lower() == username:
+                for intento in range(2):
+                    password = input("Contraseña: ")
+                    if verificar_contrasena(password, fila['password_hash']):
+                        print(f"Inicio de sesión exitoso. Bienvenido/a, {username}!", flush=True)
+                        menu_principal(username)
+                        return
+                    else:
+                        print("❌ Contraseña incorrecta.")
+                        if intento == 0:
+                            print("Intentá una vez más.")
+                print("Demasiados intentos fallidos. Volviendo al menú de acceso...")
+                return
 
-    print("❌ Usuario no encontrado.")
+    print("❌ No encontramos ese usuario.")
+    print("¿Seguro que te registraste?")
+
 
 def menu_acceso():
     inicializar_archivo_usuarios()
     while True:
-        print("\n=== GuardiánClima ITBA ===")
-        print("1. Iniciar Sesión")
-        print("2. Registrar Nuevo Usuario")
+        print("\n=== Accedé a GuardiánClima ITBA ☀️ ===")
+        print("1. Iniciar sesión")
+        print("2. Registrar nuevo usuario")
         print("3. Salir")
         opcion = input("Seleccioná una opción: ")
         if opcion == '1':
@@ -114,4 +127,5 @@ def menu_acceso():
             print("¡Hasta luego!")
             break
         else:
-            print("Opción inválida. Intenta nuevamente.")
+            print("Opción inválida. Intenta nuevamente con un número del 1 al 3.")
+
