@@ -88,23 +88,28 @@ def iniciar_sesion():
         return
 
     print("\n--- Iniciar Sesión ---")
-    username = input("Usuario: ").strip().lower()  # entrada normalizada
-    password = input("Contraseña: ")
+    username = input("Usuario: ").strip().lower()
 
     with open(ARCHIVO_USUARIOS, mode='r', newline='', encoding='utf-8') as archivo:
-        lector = csv.DictReader(archivo)
+        lector = list(csv.DictReader(archivo))
         for fila in lector:
-            if fila['username'].lower() == username:  
-                if verificar_contrasena(password, fila['password_hash']):
-                    print(f"Inicio de sesión exitoso. Bienvenido/a, {username}!", flush=True)
-                    menu_principal(username)
-                    return
-                else:
-                    print("❌ Contraseña incorrecta. Volvé a intentarlo")
-                    return
+            if fila['username'].lower() == username:
+                for intento in range(2):
+                    password = input("Contraseña: ")
+                    if verificar_contrasena(password, fila['password_hash']):
+                        print(f"Inicio de sesión exitoso. Bienvenido/a, {username}!", flush=True)
+                        menu_principal(username)
+                        return
+                    else:
+                        print("❌ Contraseña incorrecta.")
+                        if intento == 0:
+                            print("Intentá una vez más.")
+                print("Demasiados intentos fallidos. Volviendo al menú de acceso...")
+                return
 
     print("❌ No encontramos ese usuario.")
     print("¿Seguro que te registraste?")
+
 
 def menu_acceso():
     inicializar_archivo_usuarios()
