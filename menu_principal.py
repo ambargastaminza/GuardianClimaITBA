@@ -123,7 +123,7 @@ def estadisticas_globales():
                 plt.tight_layout()
                 plt.show()
 
-                ciudad_elegida = input("Ingresá una para generar un gráfico de temperatura en el tiempo: ").strip()
+                ciudad_elegida = input("Ingresá una ciudad para generar un gráfico de temperatura en el tiempo: ").strip()
                 df_ciudad = df[df['ciudad'].str.lower() == ciudad_elegida.lower()]
                 if not df_ciudad.empty:
                     df_ciudad['fecha_hora'] = pd.to_datetime(df_ciudad['fecha_hora'])
